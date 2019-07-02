@@ -1,5 +1,5 @@
 group 'com.agonyforge'
-version '0.1.2'
+version '0.1.2-SNAPSHOT'
 
 apply plugin: 'java'
 apply plugin: 'maven'
