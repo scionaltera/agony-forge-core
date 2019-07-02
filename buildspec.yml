@@ -23,3 +23,9 @@ phases:
   post_build:
     commands:
       - ./gradlew uploadArchives -PnexusUsername=${SONATYPE_USERNAME} -PnexusPassword=${SONATYPE_PASSWORD}
+      - |
+        if expr "${PROJECT_VERSION}" : "v\([0-9]\{1,\}\.\)\{2\}[0-9]\{1,\}$" >/dev/null; then
+          echo "Snapshot release."
+        elif
+          ./gradlew closeAndReleaseRepository
+        fi
