@@ -1,6 +1,7 @@
 # The Agony Forge - Core
 
-**A modern MUD development kit.**
+**A modern MUD development kit.**  
+![AWS CodeBuild](https://codebuild.us-west-2.amazonaws.com/badges?uuid=eyJlbmNyeXB0ZWREYXRhIjoiM25MSndDbnFlWDNuVnhFeE4vQlNBZ3NBaDczYkpRZnNrWGUzN3krL1lCY1BuK3JCekwva1ZSeEY0OUlCeUxGdlM5Wm54V05aRE5mV2M5LzY3c0M3Y25BPSIsIml2UGFyYW1ldGVyU3BlYyI6IjRVWWg3bjV6TzkrNzJEOXciLCJtYXRlcmlhbFNldFNlcmlhbCI6MX0%3D&branch=master)
 
 The Agony Forge is a modern, web based MUD core. It is [MIT licensed](https://raw.githubusercontent.com/scionaltera/agony-forge-core/master/LICENSE) so you can use it for anything you want, free or commercial.
 
