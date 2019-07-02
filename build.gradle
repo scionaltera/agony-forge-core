@@ -3,6 +3,7 @@ version '0.1.1-SNAPSHOT'
 
 apply plugin: 'java'
 apply plugin: 'maven'
+apply plugin: 'signing'
 apply plugin: 'info.solidsoft.pitest'
 apply plugin: 'org.owasp.dependencycheck'
 apply plugin: 'org.kordamp.gradle.stats'
@@ -143,8 +144,8 @@ extraArchive {
 }
 
 signing {
-    def signingKey = findProperty("signingKey")
-    def signingPassword = findProperty("signingPassword")
+    def signingKey = findProperty("signingKey").toString()
+    def signingPassword = findProperty("signingPassword").toString()
 
     useInMemoryPgpKeys(signingKey, signingPassword)
 }

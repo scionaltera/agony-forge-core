@@ -4,8 +4,8 @@ env:
   parameter-store:
     SONATYPE_USERNAME: "sonatype-username"
     SONATYPE_PASSWORD: "sonatype-password"
-    SONATYPE_KEY_PASSWORD: "sonatype-key-password"
-    SONATYPE_SECRET_KEY: "sonatype-secret-key"
+    ORG_GRADLE_PROJECT_signingKey: "sonatype-secret-key"
+    ORG_GRADLE_PROJECT_signingPassword: "sonatype-key-password"
 
 phases:
   install:
@@ -22,4 +22,4 @@ phases:
       - ./gradlew --console=plain clean build -x dependencyCheckAnalyze
   post_build:
     commands:
-      - ./gradlew uploadArchives -PnexusUsername=${SONATYPE_USERNAME} -PnexusPassword=${SONATYPE_PASSWORD} -PsigningKey=${SONATYPE_SECRET_KEY} -PsigningPassword=${SONATYPE_KEY_PASSWORD}
+      - ./gradlew uploadArchives -PnexusUsername=${SONATYPE_USERNAME} -PnexusPassword=${SONATYPE_PASSWORD}
