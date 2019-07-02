@@ -2,8 +2,8 @@ version: 0.2
 
 env:
   parameter-store:
-    SONATYPE_USERNAME: "sonatype-username"
-    SONATYPE_PASSWORD: "sonatype-password"
+    ORG_GRADLE_PROJECT_nexusUsername: "sonatype-username"
+    ORG_GRADLE_PROJECT_nexusPassword: "sonatype-password"
     ORG_GRADLE_PROJECT_signingKey: "sonatype-secret-key"
     ORG_GRADLE_PROJECT_signingPassword: "sonatype-key-password"
 
@@ -22,10 +22,8 @@ phases:
       - ./gradlew --console=plain clean build -x dependencyCheckAnalyze
   post_build:
     commands:
-      - ./gradlew uploadArchives -PnexusUsername=${SONATYPE_USERNAME} -PnexusPassword=${SONATYPE_PASSWORD}
+      - ./gradlew uploadArchives
       - |
         if expr "${PROJECT_VERSION}" : "v\([0-9]\{1,\}\.\)\{2\}[0-9]\{1,\}$" >/dev/null; then
-          echo "Snapshot release."
-        else
           ./gradlew closeAndReleaseRepository
         fi
