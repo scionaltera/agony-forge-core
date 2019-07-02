@@ -22,6 +22,7 @@ phases:
       - ./gradlew --console=plain clean build -x dependencyCheckAnalyze
   post_build:
     commands:
+      - ./gradlew uploadArchives
       - |
         if expr "${CODEBUILD_INITIATOR}" : "codepipeline*" >/dev/null; then
           ./gradlew uploadArchives
