@@ -4,6 +4,7 @@ env:
   parameter-store:
     ORG_GRADLE_PROJECT_nexusUsername: "sonatype-username"
     ORG_GRADLE_PROJECT_nexusPassword: "sonatype-password"
+    ORG_GRADLE_PROJECT_signingKeyId: "sonatype-key-id"
     ORG_GRADLE_PROJECT_signingKey: "sonatype-secret-key"
     ORG_GRADLE_PROJECT_signingPassword: "sonatype-key-password"
 
@@ -29,6 +30,10 @@ phases:
       - |
         if [ ! -z "${ORG_GRADLE_PROJECT_nexusPassword}" ]; then
           echo "Nexus password is present."
+        fi
+      - |
+        if [ ! -z "${ORG_GRADLE_PROJECT_signingKeyId}" ]; then
+          echo "Signing key ID is present."
         fi
       - |
         if [ ! -z "${ORG_GRADLE_PROJECT_signingKey}" ]; then
