@@ -22,8 +22,13 @@ phases:
       - ./gradlew --console=plain clean build -x dependencyCheckAnalyze
   post_build:
     commands:
-      - ./gradlew uploadArchives
+      - |
+        if expr "${CODEBUILD_INITIATOR}" : "codepipeline*" >/dev/null; then
+          ./gradlew uploadArchives
+        fi
       - |
         if expr "${PROJECT_VERSION}" : "v\([0-9]\{1,\}\.\)\{2\}[0-9]\{1,\}$" >/dev/null; then
-          ./gradlew closeAndReleaseRepository
+          if expr "${CODEBUILD_INITIATOR}" : "codepipeline*" >/dev/null; then
+            ./gradlew closeAndReleaseRepository
+          fi
         fi
