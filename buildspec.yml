@@ -1,0 +1,20 @@
+version: 0.2
+
+env:
+  parameter-store:
+    SONATYPE_USERNAME: "sonatype-username"
+    SONATYPE_PASSWORD: "sonatype-password"
+
+phases:
+  install:
+    runtime-versions:
+      java: openjdk8
+    commands:
+      - chmod +x ./gradlew
+  pre-build:
+    commands:
+      - export PROJECT_VERSION=v`egrep "^version" build.gradle | cut -f2 -d\'`
+      - echo Project version is ${PROJECT_VERSION}
+  build:
+    commands:
+      - ./gradlew clean build
