@@ -22,10 +22,10 @@ phases:
       - ./gradlew --console=plain clean build -x dependencyCheckAnalyze
   post_build:
     commands:
-      - if [[ ! -z $ORG_GRADLE_PROJECT_nexusUsername ]] echo "Nexus username is present."
-      - if [[ ! -z $ORG_GRADLE_PROJECT_nexusPassword ]] echo "Nexus password is present."
-      - if [[ ! -z $ORG_GRADLE_PROJECT_signingKey ]] echo "Signing key is present."
-      - if [[ ! -z $ORG_GRADLE_PROJECT_signingPassword ]] echo "Signing password is present."
+      - if [[ ! -z $ORG_GRADLE_PROJECT_nexusUsername ]] ; then echo "Nexus username is present."; fi
+      - if [[ ! -z $ORG_GRADLE_PROJECT_nexusPassword ]] ; then echo "Nexus password is present."; fi
+      - if [[ ! -z $ORG_GRADLE_PROJECT_signingKey ]] ; then echo "Signing key is present."; fi
+      - if [[ ! -z $ORG_GRADLE_PROJECT_signingPassword ]] ; then echo "Signing password is present."; fi
       - |
         if expr "${CODEBUILD_INITIATOR}" : "codepipeline*" >/dev/null; then
           ./gradlew uploadArchives
