@@ -22,4 +22,4 @@ phases:
       - ./gradlew --console=plain clean build -x dependencyCheckAnalyze
   post_build:
     commands:
-      - ./gradlew uploadArchives -PnexusUsername=${SONATYPE_USERNAME} -PnexusPassword=${SONATYPE_PASSWORD} -Psigning.key=${SONATYPE_SECRET_KEY} -Psigning.password=${SONATYPE_KEY_PASSWORD}
+      - ./gradlew uploadArchives -PnexusUsername=${SONATYPE_USERNAME} -PnexusPassword=${SONATYPE_PASSWORD} -PsigningKey=${SONATYPE_SECRET_KEY} -PsigningPassword=${SONATYPE_KEY_PASSWORD}
