@@ -4,7 +4,6 @@ env:
   parameter-store:
     ORG_GRADLE_PROJECT_nexusUsername: "sonatype-username"
     ORG_GRADLE_PROJECT_nexusPassword: "sonatype-password"
-    ORG_GRADLE_PROJECT_signingKeyId: "sonatype-key-id"
     ORG_GRADLE_PROJECT_signingKey: "sonatype-secret-key"
     ORG_GRADLE_PROJECT_signingPassword: "sonatype-key-password"
 
@@ -23,26 +22,6 @@ phases:
       - ./gradlew --console=plain clean build -x dependencyCheckAnalyze
   post_build:
     commands:
-      - |
-        if [ ! -z "${ORG_GRADLE_PROJECT_nexusUsername}" ]; then
-          echo "Nexus username is present."
-        fi
-      - |
-        if [ ! -z "${ORG_GRADLE_PROJECT_nexusPassword}" ]; then
-          echo "Nexus password is present."
-        fi
-      - |
-        if [ ! -z "${ORG_GRADLE_PROJECT_signingKeyId}" ]; then
-          echo "Signing key ID is present."
-        fi
-      - |
-        if [ ! -z "${ORG_GRADLE_PROJECT_signingKey}" ]; then
-          echo "Signing key is present."
-        fi
-      - |
-        if [ ! -z "${ORG_GRADLE_PROJECT_signingPassword}" ]; then
-          echo "Signing password is present."
-        fi
       - |
         if expr "${CODEBUILD_INITIATOR}" : "codepipeline*" >/dev/null; then
           ./gradlew uploadArchives
