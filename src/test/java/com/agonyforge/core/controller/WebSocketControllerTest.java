@@ -14,6 +14,10 @@ import org.springframework.messaging.Message;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.support.GenericMessage;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.session.Session;
+import org.springframework.session.SessionRepository;
 
 import java.security.Principal;
 import java.util.HashMap;
@@ -23,16 +27,24 @@ import java.util.UUID;
 
 import static com.agonyforge.core.controller.ControllerConstants.AGONY_CONNECTION_ID_KEY;
 import static com.agonyforge.core.controller.ControllerConstants.AGONY_REMOTE_IP_KEY;
+import static com.agonyforge.core.model.DefaultLoginConnectionState.RECONNECT;
 import static com.agonyforge.core.model.PrimaryConnectionState.LOGIN;
 import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.*;
+import static org.springframework.security.web.context.HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY;
 import static org.springframework.web.socket.server.support.HttpSessionHandshakeInterceptor.HTTP_SESSION_ID_ATTR_NAME;
 
 public class WebSocketControllerTest {
     @Mock
     private ConnectionRepository connectionRepository;
+
+    @Mock
+    private SessionRepository sessionRepository;
+
+    @Mock
+    private Session session;
 
     @Mock
     private Interpreter interpreter;
@@ -59,6 +71,7 @@ public class WebSocketControllerTest {
             return c;
         });
         when(connectionRepository.findById(any(UUID.class))).thenReturn(Optional.of(connection));
+        when(sessionRepository.findById(any())).thenReturn(session);
         when(interpreter.prompt(any(Connection.class))).thenReturn(new Output("[default]> "));
         when(interpreter.interpret(any(Input.class), any(Connection.class))).thenAnswer(invocation -> {
             Input input = invocation.getArgument(0);
@@ -66,7 +79,11 @@ public class WebSocketControllerTest {
             return new Output("[cyan]" + input.toString(), "[default]> ");
         });
 
-        controller = new WebSocketController(loader, connectionRepository, interpreter);
+        controller = new WebSocketController(
+            loader,
+            connectionRepository,
+            sessionRepository,
+            interpreter);
     }
 
     @Test
@@ -90,6 +107,30 @@ public class WebSocketControllerTest {
         assertNotNull(UUID.fromString(connection.getHttpSessionId()));
         assertEquals("1.2.3.4", connection.getRemoteAddress());
         assertEquals(LOGIN, connection.getPrimaryState());
+    }
+
+    @Test
+    public void testOnSubscribeReconnect() {
+        Message<byte[]> message = buildMockMessage(true, false);
+        Authentication authentication = mock(Authentication.class);
+        SecurityContext securityContext = mock(SecurityContext.class);
+
+        when(authentication.isAuthenticated()).thenReturn(true);
+        when(authentication.getName()).thenReturn("Scion");
+
+        when(session.getAttribute(eq(SPRING_SECURITY_CONTEXT_KEY))).thenReturn(securityContext);
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+
+        Output result = controller.onSubscribe(principal, message);
+
+        assertNotNull(result);
+        verify(connectionRepository).save(connectionCaptor.capture());
+
+        Connection connection = connectionCaptor.getValue();
+
+        assertEquals("Scion", connection.getName());
+        assertEquals(LOGIN, connection.getPrimaryState());
+        assertEquals(RECONNECT.name(), connection.getSecondaryState());
     }
 
     @Test

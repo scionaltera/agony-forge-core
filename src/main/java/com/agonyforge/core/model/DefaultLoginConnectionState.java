@@ -10,7 +10,8 @@ public enum DefaultLoginConnectionState implements PersistentEnum {
     CREATE_CHOOSE_NAME(3, "createChooseName"),
     CREATE_CONFIRM_NAME(4, "createConfirmName"),
     CREATE_CHOOSE_PASSWORD(5, "createChoosePassword"),
-    CREATE_CONFIRM_PASSWORD(6, "createConfirmPassword");
+    CREATE_CONFIRM_PASSWORD(6, "createConfirmPassword"),
+    RECONNECT(7, "reconnect");
 
     private int index;
     private String property;

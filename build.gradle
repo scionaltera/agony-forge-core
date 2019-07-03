@@ -100,6 +100,7 @@ artifacts {
 
 pitest {
     excludedClasses = [
+        "com.agonyforge.core.config.*"
     ]
     excludedMethods = [
         'hashCode',
