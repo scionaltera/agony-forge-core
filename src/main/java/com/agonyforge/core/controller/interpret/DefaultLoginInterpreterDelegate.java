@@ -66,6 +66,12 @@ public class DefaultLoginInterpreterDelegate implements LoginInterpreterDelegate
         DefaultLoginConnectionState secondaryState = DefaultLoginConnectionState.valueOf(connection.getSecondaryState());
 
         switch (secondaryState) {
+            case RECONNECT:
+                buildCreature(connection.getName(), connection);
+
+                output.append("[yellow]Welcome back, " + connection.getName() + "!");
+                LOGGER.info("Reconnected {} from {}", connection.getName(), connection.getRemoteAddress());
+                break;
             case DEFAULT:
                 if (input.toString().equalsIgnoreCase("Y")) {
                     connection.setSecondaryState(CREATE_CHOOSE_NAME.name());
@@ -169,6 +175,7 @@ public class DefaultLoginInterpreterDelegate implements LoginInterpreterDelegate
         DefaultLoginConnectionState secondaryState = DefaultLoginConnectionState.valueOf(connection.getSecondaryState());
 
         switch (secondaryState) {
+            case RECONNECT:
             case DEFAULT:
             case LOGIN_ASK_NAME:
             case CREATE_CHOOSE_NAME:
