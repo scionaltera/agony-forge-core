@@ -60,6 +60,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
                 "/img/**",
                 "/css/**",
                 "/js/**",
+                "/actuator/health",
                 "/robots.txt")
             .permitAll()
             .anyRequest().authenticated()
