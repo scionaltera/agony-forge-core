@@ -36,7 +36,7 @@ public class SessionDisconnectListenerTest {
         Creature creature = new Creature();
 
         when(creatureRepository
-            .findByConnectionSessionUsernameAndConnectionSessionId(anyString(), anyString()))
+            .findByConnectionSessionId(anyString()))
             .thenReturn(Optional.of(creature));
 
         listener = new SessionDisconnectListener(creatureRepository);
@@ -68,7 +68,7 @@ public class SessionDisconnectListenerTest {
         SessionDisconnectEvent event = new SessionDisconnectEvent("source", message, "ffff", CloseStatus.NORMAL);
 
         when(creatureRepository
-            .findByConnectionSessionUsernameAndConnectionSessionId(anyString(), anyString()))
+            .findByConnectionSessionId(anyString()))
             .thenReturn(Optional.empty());
 
         listener.onApplicationEvent(event);
@@ -82,8 +82,6 @@ public class SessionDisconnectListenerTest {
         Map<String, Object> sessionAttributes = new HashMap<>();
         Map<String, Object> headers = new HashMap<>();
 
-        sessionAttributes.put(AGONY_STOMP_PRINCIPAL_KEY, "Dani");
-        sessionAttributes.put(AGONY_STOMP_SESSION_KEY, "abcdefg");
         sessionAttributes.put(HTTP_SESSION_ID_ATTR_NAME, springSessionId.toString());
         sessionAttributes.put(AGONY_REMOTE_IP_KEY, "12.34.56.78");
 

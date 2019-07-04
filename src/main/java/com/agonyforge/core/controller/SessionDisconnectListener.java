@@ -30,13 +30,11 @@ public class SessionDisconnectListener implements ApplicationListener<SessionDis
         Map<String, Object> attributes = headerAccessor.getSessionAttributes();
 
         if (attributes != null) {
-            creatureRepository
-                .findByConnectionSessionUsernameAndConnectionSessionId(
-                    (String) attributes.get(AGONY_STOMP_PRINCIPAL_KEY),
-                    (String) attributes.get(AGONY_STOMP_SESSION_KEY))
-                .ifPresent(creature -> creatureRepository.delete(creature));
-
             LOGGER.info("Lost connection from {}", attributes.get(AGONY_REMOTE_IP_KEY));
+
+            creatureRepository
+                .findByConnectionSessionId(event.getSessionId())
+                .ifPresent(creature -> creatureRepository.delete(creature));
 
             return;
         }

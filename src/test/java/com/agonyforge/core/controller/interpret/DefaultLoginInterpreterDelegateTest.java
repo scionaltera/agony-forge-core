@@ -134,10 +134,25 @@ public class DefaultLoginInterpreterDelegateTest {
     }
 
     @Test
+    public void testReconnect() {
+        Connection connection = new Connection();
+        connection.setName("Dani");
+        connection.setPrimaryState(LOGIN);
+        connection.setSecondaryState(RECONNECT.name());
+
+        Input input = new Input();
+        input.setInput("");
+
+        Output result = interpreter.interpret(primary, input, connection);
+
+        assertEquals("[yellow]Welcome back, Dani!\n\n[default]Dani> ", result.toString());
+    }
+
+    @Test
     public void testPromptAskNew() {
         Connection connection = new Connection();
         connection.setPrimaryState(LOGIN);
-        connection.setSecondaryState("DEFAULT");
+        connection.setSecondaryState(DEFAULT.name());
 
         Output result = interpreter.prompt(primary, connection);
 

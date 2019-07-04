@@ -9,7 +9,7 @@ import java.util.UUID;
 import java.util.stream.Stream;
 
 public interface CreatureRepository extends JpaRepository<Creature, UUID> {
-    Optional<Creature> findByConnectionSessionUsernameAndConnectionSessionId(String sessionUsername, String sessionId);
     Stream<Creature> findByConnectionIsNotNull();
     Optional<Creature> findByConnection(Connection connection);
+    Optional<Creature> findByConnectionSessionId(String sessionId);
 }
