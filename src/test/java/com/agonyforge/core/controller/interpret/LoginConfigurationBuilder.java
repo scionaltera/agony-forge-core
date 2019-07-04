@@ -5,11 +5,12 @@ import com.agonyforge.core.config.LoginConfiguration;
 import java.util.HashMap;
 import java.util.Map;
 
-public class LoginConfigurationBuilder {
-    public LoginConfiguration build() {
+class LoginConfigurationBuilder {
+    LoginConfiguration build() {
         LoginConfiguration loginConfiguration = new LoginConfiguration();
         Map<String, String> prompts = new HashMap<>();
 
+        prompts.put("reconnect", "[green]Press &#91;Enter&#93; to reconnect...");
         prompts.put("askNew", "[default]Create a new character? [y/N]: ");
         prompts.put("loginAskName", "[default]Name: ");
         prompts.put("loginAskPassword", "[default]Password: ");
