@@ -23,9 +23,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.session.Session;
 import org.springframework.session.SessionRepository;
+import org.springframework.util.StringUtils;
 
 import javax.transaction.Transactional;
 import java.util.Collections;
+import java.util.Optional;
 
 import static com.agonyforge.core.model.DefaultLoginConnectionState.*;
 import static com.agonyforge.core.model.PrimaryConnectionState.IN_GAME;
@@ -67,10 +69,14 @@ public class DefaultLoginInterpreterDelegate implements LoginInterpreterDelegate
 
         switch (secondaryState) {
             case RECONNECT:
-                buildCreature(connection.getName(), connection);
+                if (!StringUtils.isEmpty(input.toString())) {
+                    connection.setSecondaryState(DEFAULT.name());
+                } else {
+                    findOrBuildCreature(connection.getName(), connection);
 
-                output.append("[yellow]Welcome back, " + connection.getName() + "!");
-                LOGGER.info("Reconnected {} from {}", connection.getName(), connection.getRemoteAddress());
+                    output.append("[yellow]Welcome back, " + connection.getName() + "!");
+                    LOGGER.info("Reconnected {} from {}", connection.getName(), connection.getRemoteAddress());
+                }
                 break;
             case DEFAULT:
                 if (input.toString().equalsIgnoreCase("Y")) {
@@ -90,7 +96,7 @@ public class DefaultLoginInterpreterDelegate implements LoginInterpreterDelegate
             case LOGIN_ASK_PASSWORD:
                 try {
                     logUserIn(connection.getName(), input.toString(), connection);
-                    buildCreature(connection.getName(), connection);
+                    findOrBuildCreature(connection.getName(), connection);
 
                     output.append("[yellow]Welcome back, " + connection.getName() + "!");
 
@@ -148,7 +154,7 @@ public class DefaultLoginInterpreterDelegate implements LoginInterpreterDelegate
             case CREATE_CONFIRM_PASSWORD:
                 try {
                     logUserIn(connection.getName(), validatePassword(input.toString()), connection);
-                    buildCreature(connection.getName(), connection);
+                    findOrBuildCreature(connection.getName(), connection);
 
                     output.append("[yellow]Welcome, " + connection.getName() + "!");
 
@@ -242,10 +248,29 @@ public class DefaultLoginInterpreterDelegate implements LoginInterpreterDelegate
         sessionRepository.save(session);
     }
 
-    private void buildCreature(String name, Connection connection) {
-        Creature creature = new Creature();
+    private void findOrBuildCreature(String name, Connection connection) {
+        Optional<Creature> optionalCreature = creatureRepository
+            .findByConnectionDisconnectedIsNotNull()
+            .filter(c -> c.getName().equals(name))
+            .findFirst();
 
-        creature.setName(name);
+        Creature creature = optionalCreature.orElseGet(() -> {
+            Creature c = new Creature();
+
+            c.setName(name);
+
+            return c;
+        });
+
+        if (creature.getConnection() != null) {
+            Connection oldConnection = creature.getConnection();
+
+            creature.setConnection(null);
+
+            creatureRepository.save(creature);
+            connectionRepository.delete(oldConnection);
+        }
+
         creature.setConnection(connection);
 
         creatureRepository.save(creature);

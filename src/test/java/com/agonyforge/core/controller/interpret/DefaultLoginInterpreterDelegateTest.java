@@ -22,8 +22,10 @@ import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.session.Session;
 import org.springframework.session.SessionRepository;
 
+import java.util.Date;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 import static com.agonyforge.core.model.DefaultLoginConnectionState.*;
 import static com.agonyforge.core.model.PrimaryConnectionState.IN_GAME;
@@ -135,17 +137,57 @@ public class DefaultLoginInterpreterDelegateTest {
 
     @Test
     public void testReconnect() {
+        Connection oldConnection = new Connection();
+        oldConnection.setName("Dani");
+        oldConnection.setDisconnected(new Date());
+
+        Connection connection = new Connection();
+        connection.setName("Dani");
+        connection.setPrimaryState(LOGIN);
+        connection.setSecondaryState(RECONNECT.name());
+
+        Creature creature = new Creature();
+        creature.setName("Dani");
+        creature.setConnection(oldConnection);
+
+        Input input = new Input();
+        input.setInput("");
+
+        when(creatureRepository.findByConnectionDisconnectedIsNotNull())
+            .thenReturn(Stream.of(creature));
+
+        doAnswer(invocation -> {
+            Connection c = invocation.getArgument(0);
+
+            if (c.equals(creature.getConnection())) {
+                throw new RuntimeException("Can't delete this when there's a reference to it!");
+            }
+
+            return c;
+        }).when(connectionRepository).delete(any());
+
+        Output result = interpreter.interpret(primary, input, connection);
+
+        assertEquals("[yellow]Welcome back, Dani!\n\n[default]Dani> ", result.toString());
+
+        verify(connectionRepository).delete(eq(oldConnection));
+        verify(creatureRepository, atLeastOnce()).save(eq(creature));
+    }
+
+    @Test
+    public void testReconnectChangeCharacter() {
         Connection connection = new Connection();
         connection.setName("Dani");
         connection.setPrimaryState(LOGIN);
         connection.setSecondaryState(RECONNECT.name());
 
         Input input = new Input();
-        input.setInput("");
+        input.setInput("n");
 
         Output result = interpreter.interpret(primary, input, connection);
 
-        assertEquals("[yellow]Welcome back, Dani!\n\n[default]Dani> ", result.toString());
+        assertEquals("[default]Create a new character? [y/N]: ", result.toString());
+        assertEquals(DEFAULT.name(), connection.getSecondaryState());
     }
 
     @Test

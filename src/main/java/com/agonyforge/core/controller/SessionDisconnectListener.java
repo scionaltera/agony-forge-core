@@ -1,6 +1,7 @@
 package com.agonyforge.core.controller;
 
-import com.agonyforge.core.repository.CreatureRepository;
+import com.agonyforge.core.model.Connection;
+import com.agonyforge.core.repository.ConnectionRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationListener;
@@ -9,6 +10,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 
 import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 import static com.agonyforge.core.controller.ControllerConstants.*;
@@ -17,11 +21,11 @@ import static com.agonyforge.core.controller.ControllerConstants.*;
 public class SessionDisconnectListener implements ApplicationListener<SessionDisconnectEvent> {
     private static final Logger LOGGER = LoggerFactory.getLogger(SessionDisconnectListener.class);
 
-    private CreatureRepository creatureRepository;
+    private ConnectionRepository connectionRepository;
 
     @Inject
-    public SessionDisconnectListener(CreatureRepository creatureRepository) {
-        this.creatureRepository = creatureRepository;
+    public SessionDisconnectListener(ConnectionRepository connectionRepository) {
+        this.connectionRepository = connectionRepository;
     }
 
     @Override
@@ -32,9 +36,18 @@ public class SessionDisconnectListener implements ApplicationListener<SessionDis
         if (attributes != null) {
             LOGGER.info("Lost connection from {}", attributes.get(AGONY_REMOTE_IP_KEY));
 
-            creatureRepository
-                .findByConnectionSessionId(event.getSessionId())
-                .ifPresent(creature -> creatureRepository.delete(creature));
+            List<Connection> updated = new ArrayList<>();
+
+            connectionRepository
+                .findBySessionId(event.getSessionId())
+                .ifPresent(connection -> {
+                    connection.setDisconnected(new Date());
+                    updated.add(connection);
+                });
+
+            if (!updated.isEmpty()) {
+                connectionRepository.saveAll(updated);
+            }
 
             return;
         }
