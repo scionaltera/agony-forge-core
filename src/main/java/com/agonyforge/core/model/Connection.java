@@ -8,6 +8,7 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import java.util.Date;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -24,6 +25,7 @@ public class Connection {
     private String httpSessionId;
     private String remoteAddress;
     private String name;
+    private Date disconnected;
 
     @Enumerated(EnumType.STRING)
     private PrimaryConnectionState primaryState;
@@ -76,6 +78,14 @@ public class Connection {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Date getDisconnected() {
+        return disconnected;
+    }
+
+    public void setDisconnected(Date disconnected) {
+        this.disconnected = disconnected;
     }
 
     public PrimaryConnectionState getPrimaryState() {
